@@ -8,7 +8,6 @@
 
 int main(int argc, char **argv)
 {
-    // check arg
     if (argc < 3)
     {
         std::cout << "Usage : vdb2raw <input_path> <output_path>" << std::endl;
@@ -18,24 +17,18 @@ int main(int argc, char **argv)
     std::string inputPath = argv[1];
     std::string outputPath = argv[2];
 
-    // open vdb file
     openvdb::initialize();
     openvdb::io::File inputFile(inputPath);
     if (!inputFile.open())
     {
-        std::cout << "Can't open " << argv[1] << std::endl;
+        std::cout << "Can't open " << inputPath << std::endl;
         return EXIT_FAILURE;
     }
 
-    // loop over all grids
     for (openvdb::io::File::NameIterator nameIter = inputFile.beginName(); nameIter != inputFile.endName(); ++nameIter)
     {
-        // open the grid
         std::string name = nameIter.gridName();
         openvdb::FloatGrid::Ptr grid = openvdb::gridPtrCast<openvdb::FloatGrid>(inputFile.readGrid(name));
-
-        // if (grid->metaValue<std::string>("value_type") != "float") // only export float grid
-        //     continue;
 
         std::cout << "Converting grid: " << name << std::endl;
         // show metadata
@@ -64,7 +57,7 @@ int main(int argc, char **argv)
 
         std::ofstream outputFile(outputPath, std::ofstream::binary);
 
-        // open output file and write header ( width, height and depth in int)
+        // Write header ( width, height and depth in int)
         outputFile.write((const char *)&size, sizeof(int) * 3);
 
         // write data
